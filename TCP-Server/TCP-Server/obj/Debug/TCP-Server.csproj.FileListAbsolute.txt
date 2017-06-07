@@ -1,0 +1,12 @@
+C:\BATwork\BatMan\案例记录\TCP-Server\TCP-Server\bin\Debug\TCP-Server.exe.config
+C:\BATwork\BatMan\案例记录\TCP-Server\TCP-Server\bin\Debug\TCP-Server.exe
+C:\BATwork\BatMan\案例记录\TCP-Server\TCP-Server\bin\Debug\TCP-Server.pdb
+C:\BATwork\BatMan\案例记录\TCP-Server\TCP-Server\obj\Debug\TCP-Server.exe
+C:\BATwork\BatMan\案例记录\TCP-Server\TCP-Server\obj\Debug\TCP-Server.pdb
+D:\BatWork\BatMan\案例记录\TCP-Server\TCP-Server\bin\Debug\TCP-Server.exe.config
+D:\BatWork\BatMan\案例记录\TCP-Server\TCP-Server\obj\Debug\TCP-Server.exe
+D:\BatWork\BatMan\案例记录\TCP-Server\TCP-Server\obj\Debug\TCP-Server.pdb
+C:\BATwork\BatMan\案例记录\TCP-Server\TCP-Server\obj\Debug\TCP-Server.csprojResolveAssemblyReference.cache
+D:\BatWork\BatMan\案例记录\TCP-Server\TCP-Server\bin\Debug\TCP-Server.exe
+D:\BatWork\BatMan\案例记录\TCP-Server\TCP-Server\bin\Debug\TCP-Server.pdb
+D:\BatWork\BatMan\案例记录\TCP-Server\TCP-Server\obj\Debug\TCP-Server.csprojResolveAssemblyReference.cache

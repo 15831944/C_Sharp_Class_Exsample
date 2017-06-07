@@ -1,0 +1,9 @@
+C:\BATwork\BatMan\案例记录\TCP-Server\TCP-Client\bin\Debug\TCP-Client.exe.config
+C:\BATwork\BatMan\案例记录\TCP-Server\TCP-Client\bin\Debug\TCP-Client.exe
+C:\BATwork\BatMan\案例记录\TCP-Server\TCP-Client\bin\Debug\TCP-Client.pdb
+C:\BATwork\BatMan\案例记录\TCP-Server\TCP-Client\obj\Debug\TCP_Client.Form1.resources
+C:\BATwork\BatMan\案例记录\TCP-Server\TCP-Client\obj\Debug\TCP_Client.Properties.Resources.resources
+C:\BATwork\BatMan\案例记录\TCP-Server\TCP-Client\obj\Debug\TCP-Client.csproj.GenerateResource.Cache
+C:\BATwork\BatMan\案例记录\TCP-Server\TCP-Client\obj\Debug\TCP-Client.exe
+C:\BATwork\BatMan\案例记录\TCP-Server\TCP-Client\obj\Debug\TCP-Client.pdb
+C:\BATwork\BatMan\案例记录\TCP-Server\TCP-Client\obj\Debug\TCP-Client.csprojResolveAssemblyReference.cache

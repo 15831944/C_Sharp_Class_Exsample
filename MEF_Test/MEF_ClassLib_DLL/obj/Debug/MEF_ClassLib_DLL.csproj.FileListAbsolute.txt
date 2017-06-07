@@ -1,0 +1,5 @@
+C:\code\MEF-TEST\MEF_Test\MEF_Master\bin\Debug\plugin\ClassLibs\MEF_ClassLib_DLL.dll
+C:\code\MEF-TEST\MEF_Test\MEF_Master\bin\Debug\plugin\ClassLibs\MEF_ClassLib_DLL.pdb
+C:\code\MEF-TEST\MEF_Test\MEF_ClassLib_DLL\obj\Debug\MEF_ClassLib_DLL.csprojResolveAssemblyReference.cache
+C:\code\MEF-TEST\MEF_Test\MEF_ClassLib_DLL\obj\Debug\MEF_ClassLib_DLL.dll
+C:\code\MEF-TEST\MEF_Test\MEF_ClassLib_DLL\obj\Debug\MEF_ClassLib_DLL.pdb

@@ -1,0 +1,2 @@
+qprocess *
+pause>nul

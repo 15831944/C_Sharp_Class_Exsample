@@ -1,0 +1,4 @@
+C:\code\MEF-TEST\MEF_Test\IPlugin\bin\Debug\IPlugin.dll
+C:\code\MEF-TEST\MEF_Test\IPlugin\bin\Debug\IPlugin.pdb
+C:\code\MEF-TEST\MEF_Test\IPlugin\obj\Debug\IPlugin.dll
+C:\code\MEF-TEST\MEF_Test\IPlugin\obj\Debug\IPlugin.pdb
