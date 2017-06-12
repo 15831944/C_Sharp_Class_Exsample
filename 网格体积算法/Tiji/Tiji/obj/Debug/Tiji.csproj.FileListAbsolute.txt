@@ -1,1 +1,2 @@
 D:\BatWork\BatMan\案例记录\网格体积算法\Tiji\Tiji\bin\Debug\Tiji.exe.config
+E:\code\C_Sharp_Class_Exsample\网格体积算法\Tiji\Tiji\bin\Debug\Tiji.exe.config
