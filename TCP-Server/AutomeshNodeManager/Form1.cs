@@ -18,7 +18,7 @@ namespace AutomeshNodeManager
     {
         string serviceFilePath = $"{Application.StartupPath}\\AutoMeshNodeServerInstaller.exe";
         string serviceName = "am_node_server";
-
+        ServiceController svr;
         public Form1()
         {
             InitializeComponent();
@@ -52,8 +52,7 @@ namespace AutomeshNodeManager
             //启动后最小化
             //WindowState = FormWindowState.Minimized;
 
-            //检测服务
-            
+            timer1.Start();
         }
 
         /// <summary>
@@ -99,13 +98,14 @@ namespace AutomeshNodeManager
                 this.Close();
             }
         }
-        
 
-  
+
+
         //事件：安装服务
         private void install_btn_Click(object sender, EventArgs e)
         {
-            if (this.IsServiceExisted()) this.UninstallService();
+            if (this.IsServiceExisted())
+                this.UninstallService();
             this.InstallService();
         }
 
@@ -153,6 +153,7 @@ namespace AutomeshNodeManager
             {
                 if (sc.ServiceName.ToLower() == serviceName.ToLower())
                 {
+                    svr = svr ?? sc;
                     return true;
                 }
             }
@@ -185,13 +186,11 @@ namespace AutomeshNodeManager
         //启动服务
         private void ServiceStart()
         {
-            using (ServiceController control = new ServiceController(serviceName))
-            {
-                if (control.Status == ServiceControllerStatus.Stopped)
+                if (svr.Status == ServiceControllerStatus.Stopped)
                 {
-                    control.Start();
+                    svr.Start();
                 }
-            }
+            
         }
 
         //停止服务
@@ -206,6 +205,48 @@ namespace AutomeshNodeManager
             }
         }
 
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            if (IsServiceExisted())
+            {
+                install_btn.Enabled = false;
+                Uninstall_btn.Enabled = true;
+                set_btn.Enabled = true;
 
+                //已安装服务
+                using (ServiceController con = new ServiceController(serviceName))
+                {
+                    if (con.Status == ServiceControllerStatus.Running)
+                    {
+                        //已启动服务
+                        start_btn.Enabled = false;
+                        stop_btn.Enabled = true;
+                        label1.Text = ">>> 服务已启动...";
+                    }
+                    else
+                    {
+                        //未启动服务
+                        start_btn.Enabled = true;
+                        stop_btn.Enabled = false;
+                        label1.Text = ">>> 服务已停止...";
+                    }
+                }
+            }
+            else
+            {
+                //未安装服务
+                install_btn.Enabled = true;
+                start_btn.Enabled = false;
+                stop_btn.Enabled = false;
+                Uninstall_btn.Enabled = false;
+                set_btn.Enabled = false;
+                label1.Text = ">>> 未安装服务";
+            }
+        }
     }
 }
