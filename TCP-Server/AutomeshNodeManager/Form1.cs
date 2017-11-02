@@ -25,16 +25,18 @@ namespace AutomeshNodeManager
         }
 
         /// <summary>
-        /// 初始化
+        /// 初始化,检测状态
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void Form1_Load(object sender, EventArgs e)
         {
+            //贴左上角
             //int SW = Screen.PrimaryScreen.Bounds.Width;
             //int SH = Screen.PrimaryScreen.Bounds.Height;
-            //贴左上角
             this.Location = new Point(Screen.PrimaryScreen.Bounds.Width - 300, 0);
+
+
             //当前IP
             IPAddress[] IP = Dns.GetHostAddresses(Dns.GetHostName());
             for (int i = 0; i < IP.Length; i++)
@@ -45,11 +47,13 @@ namespace AutomeshNodeManager
                     break;
                 }
             }
+
+
             //启动后最小化
-            WindowState = FormWindowState.Minimized;
+            //WindowState = FormWindowState.Minimized;
 
             //检测服务
-          
+            
         }
 
         /// <summary>
@@ -101,31 +105,32 @@ namespace AutomeshNodeManager
         //事件：安装服务
         private void install_btn_Click(object sender, EventArgs e)
         {
-            if (this.IsServiceExisted(serviceName)) this.UninstallService(serviceName);
-            this.InstallService(serviceFilePath);
+            if (this.IsServiceExisted()) this.UninstallService();
+            this.InstallService();
         }
 
         //事件：启动服务
         private void start_btn_Click(object sender, EventArgs e)
         {
-            if (this.IsServiceExisted(serviceName)) this.ServiceStart(serviceName);
+            if (this.IsServiceExisted()) this.ServiceStart();
         }
 
         //事件：停止服务
         private void stop_btn_Click(object sender, EventArgs e)
         {
-            if (this.IsServiceExisted(serviceName)) this.ServiceStop(serviceName);
+            if (this.IsServiceExisted()) this.ServiceStop();
         }
 
         //事件：卸载服务
         private void Uninstall_btn_Click(object sender, EventArgs e)
         {
-            if (this.IsServiceExisted(serviceName))
+            if (this.IsServiceExisted())
             {
-                this.ServiceStop(serviceName);
-                this.UninstallService(serviceFilePath);
+                this.ServiceStop();
+                this.UninstallService();
             }
         }
+
         private void set_btn_Click(object sender, EventArgs e)
         {
 
@@ -137,8 +142,11 @@ namespace AutomeshNodeManager
         }
 
 
+
+
+
         //判断服务是否存在
-        private bool IsServiceExisted(string serviceName)
+        private bool IsServiceExisted()
         {
             ServiceController[] services = ServiceController.GetServices();
             foreach (ServiceController sc in services)
@@ -152,7 +160,7 @@ namespace AutomeshNodeManager
         }
 
         //安装服务
-        private void InstallService(string serviceFilePath)
+        private void InstallService()
         {
             using (AssemblyInstaller installer = new AssemblyInstaller())
             {
@@ -165,7 +173,7 @@ namespace AutomeshNodeManager
         }
 
         //卸载服务
-        private void UninstallService(string serviceFilePath)
+        private void UninstallService()
         {
             using (AssemblyInstaller installer = new AssemblyInstaller())
             {
@@ -175,7 +183,7 @@ namespace AutomeshNodeManager
             }
         }
         //启动服务
-        private void ServiceStart(string serviceName)
+        private void ServiceStart()
         {
             using (ServiceController control = new ServiceController(serviceName))
             {
@@ -187,7 +195,7 @@ namespace AutomeshNodeManager
         }
 
         //停止服务
-        private void ServiceStop(string serviceName)
+        private void ServiceStop()
         {
             using (ServiceController control = new ServiceController(serviceName))
             {
