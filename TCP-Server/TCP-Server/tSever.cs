@@ -8,12 +8,14 @@ using System.IO;
 using System.Threading;
 using System.Diagnostics;
 
-namespace PictureServer
+namespace TCP_Server
 {
     class Program
     {
         static void Main(string[] args)
         {
+            AM_Node_Manager ff = new AM_Node_Manager();
+
 
             int port = 22215;
 

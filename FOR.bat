@@ -1,6 +1,6 @@
-@echo off 
+﻿@echo off 
 
-	::Setlocal Enabledelayedexpansion
+	::Setlocal Enabledelayedexpansion 
 
 @echo ----------------------------------------- 1  (array)
 	::遍历集合
