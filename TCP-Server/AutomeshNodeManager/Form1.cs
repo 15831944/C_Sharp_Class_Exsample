@@ -16,9 +16,13 @@ namespace AutomeshNodeManager
 {
     public partial class Form1 : Form
     {
+        //服务程序
         string serviceFilePath = $"{Application.StartupPath}\\AutoMeshNodeServerInstaller.exe";
+
+        //服务名称，对应服务程序中的服务名
         string serviceName = "am_node_server";
-        ServiceController svr;
+
+        #region 窗体相关
         public Form1()
         {
             InitializeComponent();
@@ -54,7 +58,7 @@ namespace AutomeshNodeManager
 
             timer1.Start();
         }
-
+        
         /// <summary>
         /// 最小化
         /// </summary>
@@ -98,8 +102,9 @@ namespace AutomeshNodeManager
                 this.Close();
             }
         }
+        #endregion
 
-
+        #region 交互事件
 
         //事件：安装服务
         private void install_btn_Click(object sender, EventArgs e)
@@ -141,11 +146,14 @@ namespace AutomeshNodeManager
 
         }
 
+        #endregion
 
+        #region 相关方法
 
-
-
-        //判断服务是否存在
+        /// <summary>
+        /// 判断服务是否存在
+        /// </summary>
+        /// <returns></returns>
         private bool IsServiceExisted()
         {
             ServiceController[] services = ServiceController.GetServices();
@@ -153,14 +161,15 @@ namespace AutomeshNodeManager
             {
                 if (sc.ServiceName.ToLower() == serviceName.ToLower())
                 {
-                    svr = svr ?? sc;
                     return true;
                 }
             }
             return false;
         }
 
-        //安装服务
+        /// <summary>
+        /// 安装服务
+        /// </summary>
         private void InstallService()
         {
             using (AssemblyInstaller installer = new AssemblyInstaller())
@@ -170,10 +179,13 @@ namespace AutomeshNodeManager
                 IDictionary savedState = new Hashtable();
                 installer.Install(savedState);
                 installer.Commit(savedState);
+                MessageBox.Show("安装成功！");
             }
         }
 
-        //卸载服务
+        /// <summary>
+        /// 卸载服务
+        /// </summary>
         private void UninstallService()
         {
             using (AssemblyInstaller installer = new AssemblyInstaller())
@@ -181,19 +193,28 @@ namespace AutomeshNodeManager
                 installer.UseNewContext = true;
                 installer.Path = serviceFilePath;
                 installer.Uninstall(null);
+                MessageBox.Show("服务程序已卸载！");
             }
         }
-        //启动服务
+
+        /// <summary>
+        /// 启动服务
+        /// </summary>
         private void ServiceStart()
         {
-                if (svr.Status == ServiceControllerStatus.Stopped)
+            using (ServiceController control = new ServiceController(serviceName))
+            {
+                if (control.Status == ServiceControllerStatus.Stopped)
                 {
-                    svr.Start();
+                    control.Start();
+                   // MessageBox.Show("启动成功！");
                 }
-            
+            }
         }
 
-        //停止服务
+        /// <summary>
+        /// 停止服务
+        /// </summary>
         private void ServiceStop()
         {
             using (ServiceController control = new ServiceController(serviceName))
@@ -201,6 +222,7 @@ namespace AutomeshNodeManager
                 if (control.Status == ServiceControllerStatus.Running)
                 {
                     control.Stop();
+                   // MessageBox.Show("服务已停止！");
                 }
             }
         }
@@ -219,9 +241,9 @@ namespace AutomeshNodeManager
                 set_btn.Enabled = true;
 
                 //已安装服务
-                using (ServiceController con = new ServiceController(serviceName))
+                using (ServiceController control = new ServiceController(serviceName))
                 {
-                    if (con.Status == ServiceControllerStatus.Running)
+                    if (control.Status == ServiceControllerStatus.Running)
                     {
                         //已启动服务
                         start_btn.Enabled = false;
@@ -248,5 +270,6 @@ namespace AutomeshNodeManager
                 label1.Text = ">>> 未安装服务";
             }
         }
+        #endregion
     }
 }
