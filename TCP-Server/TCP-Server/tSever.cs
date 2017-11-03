@@ -14,9 +14,6 @@ namespace TCP_Server
     {
         static void Main(string[] args)
         {
-            AM_Node_Manager ff = new AM_Node_Manager();
-
-
             int port = 22215;
 
             TcpListener listener = new TcpListener(IPAddress.Any, port);

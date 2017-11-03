@@ -11,6 +11,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoMeshNodeServerInstaller
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutomeshNodeManager", "AutomeshNodeManager\AutomeshNodeManager.csproj", "{46A746D1-3D20-4722-B9C2-36C902ABAE3B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "From版", "From版", "{9CD4A61F-2B65-462C-8D84-BCEDFFF7AFED}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TCP功能", "TCP功能", "{A0EC0403-AF10-40BC-83E2-140A64682985}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM_Node_Consoller", "AM_Node_Consoller\AM_Node_Consoller.csproj", "{A845CA79-893D-4073-9D5D-E58BAF11B2DE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,8 +55,22 @@ Global
 		{46A746D1-3D20-4722-B9C2-36C902ABAE3B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{46A746D1-3D20-4722-B9C2-36C902ABAE3B}.Release|x64.ActiveCfg = Release|Any CPU
 		{46A746D1-3D20-4722-B9C2-36C902ABAE3B}.Release|x64.Build.0 = Release|Any CPU
+		{A845CA79-893D-4073-9D5D-E58BAF11B2DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A845CA79-893D-4073-9D5D-E58BAF11B2DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A845CA79-893D-4073-9D5D-E58BAF11B2DE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A845CA79-893D-4073-9D5D-E58BAF11B2DE}.Debug|x64.Build.0 = Debug|Any CPU
+		{A845CA79-893D-4073-9D5D-E58BAF11B2DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A845CA79-893D-4073-9D5D-E58BAF11B2DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A845CA79-893D-4073-9D5D-E58BAF11B2DE}.Release|x64.ActiveCfg = Release|Any CPU
+		{A845CA79-893D-4073-9D5D-E58BAF11B2DE}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4E8986C5-9640-4AD8-B4E1-8727E6C970C6} = {A0EC0403-AF10-40BC-83E2-140A64682985}
+		{5EB8B2F4-4E7A-45FD-A54C-E6C3A8BC8B7C} = {A0EC0403-AF10-40BC-83E2-140A64682985}
+		{DA66DE74-0AB6-4907-A189-3DB053007D40} = {9CD4A61F-2B65-462C-8D84-BCEDFFF7AFED}
+		{46A746D1-3D20-4722-B9C2-36C902ABAE3B} = {9CD4A61F-2B65-462C-8D84-BCEDFFF7AFED}
 	EndGlobalSection
 EndGlobal
