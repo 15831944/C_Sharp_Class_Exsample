@@ -11,6 +11,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Drawing;
 using System.ServiceProcess;
+using System.IO;
 
 namespace AM_Node_Controller
 {
@@ -19,36 +20,45 @@ namespace AM_Node_Controller
         private static int port = 22215;
         private const int bufferSize = 4096;
         private static string serviceName = "am_node_server";
-        private static List<string> cmdList;
+        private static List<string> cmdList = new List<string>();
+        private static string thisPath = Application.ExecutablePath;
+        private static string tempPath = Path.GetPathRoot(thisPath) + "AM_TEMP";
+        private static string appPath = "";
         static void Main(string[] args)
         {
             ConsoleWin32Helper.init();
-
-            //检测服务
-            if (!IsServiceExisted())
-            {
-                string fff = "E:\test\aa.bat";
-                //安装务服
-                cmdList = new List<string>();
-                //cmdList.Add($"@sc create {serviceName} binPath= {Application.ExecutablePath}");
-                cmdList.Add($"SET appPath= {fff}");
-                cmdList.Add($"sc create {serviceName} binPath= %appPath%");
-                cmdList.Add($"sc config {serviceName} start= AUTO"); //start = DEMAND(手动);start= DISABLED(禁用)
-                cmdList.Add($"net start {serviceName}");           //net stop {serviceName}
-                cmd(cmdList);
-            }
-            /*  安装删除服务，参考：http://www.cnblogs.com/pingming/p/5108947.html
-               %SystemRoot%\Microsoft.NET\Framework\v4.0.30319\installutil.exe "E:\wwwroot\kjsmtt\wwwroot\KJLMManagerShareOutBonus\KJLMManagerShareOutBonus.exe"
-               %SystemRoot%\Microsoft.NET\Framework\v4.0.30319\installutil.exe /u "E:\wwwroot\kjsmtt\wwwroot\KJLMManagerShareOutBonus\KJLMManagerShareOutBonus.exe"
-               */
+            getAppInfo();
+            //检测临时目录
+            if (!Directory.Exists(tempPath))
+                Directory.CreateDirectory(tempPath);
 
 
-            //删掉服务
-            cmdList = new List<string>();
-            cmdList.Add($"@sc stop {serviceName}");
-            cmdList.Add($"@sc delete {serviceName}");
-            cmd(cmdList);
+            /**
+                        //检测服务
+                        if (!IsServiceExisted())
+                        {
+                            string fff = "E:\test\aa.bat";
+                            //安装务服
+                            cmdList = new List<string>();
+                            //cmdList.Add($"@sc create {serviceName} binPath= {Application.ExecutablePath}");
+                            cmdList.Add($"SET appPath= {fff}");
+                            cmdList.Add($"sc create {serviceName} binPath= %appPath%");
+                            cmdList.Add($"sc config {serviceName} start= AUTO"); //start = DEMAND(手动);start= DISABLED(禁用)
+                            cmdList.Add($"net start {serviceName}");           //net stop {serviceName}
+                            cmd(cmdList);
+                        }
+                          安装删除服务，参考：http://www.cnblogs.com/pingming/p/5108947.html
+                           %SystemRoot%\Microsoft.NET\Framework\v4.0.30319\installutil.exe "E:\wwwroot\kjsmtt\wwwroot\KJLMManagerShareOutBonus\KJLMManagerShareOutBonus.exe"
+                           %SystemRoot%\Microsoft.NET\Framework\v4.0.30319\installutil.exe /u "E:\wwwroot\kjsmtt\wwwroot\KJLMManagerShareOutBonus\KJLMManagerShareOutBonus.exe"
+                           
 
+
+                        //删掉服务
+                        cmdList = new List<string>();
+                        cmdList.Add($"@sc stop {serviceName}");
+                        cmdList.Add($"@sc delete {serviceName}");
+                        cmd(cmdList);
+*/
 
             //启动
             Thread threadMonitorInput = new Thread(new ThreadStart(startServer));
@@ -61,7 +71,7 @@ namespace AM_Node_Controller
                 Thread.Sleep(1000);
             }
         }
-
+        #region 业务
         static void startServer()
         {
             TcpListener listener = new TcpListener(IPAddress.Any, port);
@@ -72,26 +82,129 @@ namespace AM_Node_Controller
             {
                 //如果没有用户连接，则在这一步挂起，进入等待状态！
                 TcpClient client = listener.AcceptTcpClient();
-                string clientIP = client.Client.RemoteEndPoint.ToString();
 
                 //如果有连接请求则进入这步，开始工作！
+                string clientIP = client.Client.RemoteEndPoint.ToString();
                 NetworkStream clientStream = client.GetStream();
 
                 byte[] buffer = new byte[bufferSize];
                 int readBytes = clientStream.Read(buffer, 0, bufferSize);
-                string request = Encoding.UTF8.GetString(buffer).Substring(0, readBytes);
+                string command = Encoding.UTF8.GetString(buffer).Substring(0, readBytes);
 
                 //执行操作
-                Console.WriteLine(request);
+                switch (command)
+                {
+                    case "getPCInfo":
+                        Console.Read();
+                        break;
+                    case "getTempDIRInfo":
+                        getTempDIRInfo(clientStream);
+                        break;
+                    case "clearTempDIR":
+                        clearTempDIR(clientStream);
+                        break;
+                    case "getAppInfo":
+                        Console.Read();
+                        break;
+                    case "upDateApp":
+                        Console.Read();
+                        break;
+                    case "reLoadDCMonitor":
+                        reLoadDCMonitor(clientStream);
+                        break;
+                    case "closeDCMonitor":
+                        closeDCMonitor(clientStream);
+                        break;
+                        //default: return;
+                }
 
                 //回传消息
-                //byte[] backData = Encoding.ASCII.GetBytes(request.ToUpper());
-                //clientStream.Write(backData, 0, backData.Length);
-
+                byte[] backData = Encoding.ASCII.GetBytes("Done! and ending...");
+                clientStream.Write(backData, 0, backData.Length);
                 clientStream.Close();
             }
         }
+        static void getPCInfo() { }
+        static void getTempDIRInfo(NetworkStream clientStream)
+        {
+            if (!Directory.Exists(tempPath)) Directory.CreateDirectory(tempPath);
 
+            double totalSize = 0, freeSpace = 0;
+            string root = Path.GetPathRoot(thisPath);
+            System.IO.DriveInfo[] drives = System.IO.DriveInfo.GetDrives();
+            foreach (System.IO.DriveInfo drive in drives)
+            {
+                if (drive.Name == root)
+                {
+                    totalSize = drive.TotalSize / (1024 * 1024 * 1024 * 1.0);
+                    freeSpace = drive.TotalFreeSpace / (1024 * 1024 * 1024 * 1.0);
+                }
+            }
+            string res = "可用空间：" + freeSpace.ToString("f2") + " GB; 共有：" + totalSize.ToString("f2") + " GB;";
+            byte[] backData = Encoding.ASCII.GetBytes(res);
+            clientStream.Write(backData, 0, backData.Length);
+        }
+        static void clearTempDIR(NetworkStream clientStream)
+        {
+            if (Directory.Exists(tempPath))
+            {
+                string[] files = Directory.GetFiles(tempPath, "", SearchOption.AllDirectories);
+                foreach (string f in files) File.Delete(f);
+                string[] dirs = Directory.GetDirectories(tempPath, "", SearchOption.AllDirectories);
+                foreach (string d in dirs) Directory.Delete(d);
+            }
+            else
+            {
+                Directory.CreateDirectory(tempPath);
+            }
+            string res = "节点临时目录已清空！";
+            byte[] backData = Encoding.ASCII.GetBytes(res);
+            clientStream.Write(backData, 0, backData.Length);
+        }
+        static void getAppInfo()
+        {
+            FileInfo fi = new FileInfo("c:\\os848618.bin");
+            string ye = fi.CreationTime.Year.ToString();
+            string mon = fi.CreationTime.Month.ToString();
+            string day = fi.CreationTime.Day.ToString();
+        }
+        static void upDateApp() { }
+        static void getDCMonitorStatus()
+        {
+            //获取线程运行状态
+            Process[] dc = Process.GetProcessesByName("DCMonitor");
+            foreach (var r in dc)
+                if (r.Responding)
+                    Console.WriteLine("DCMonitor运行正常！");
+
+            Process[] sfm = Process.GetProcessesByName("SFMcomputer");
+            foreach (var r in sfm)
+                if (r.Responding)
+                    Console.WriteLine("SFMcomputer运行正常！");
+        }
+        static void reLoadDCMonitor(NetworkStream clientStream)
+        {
+            closeDCMonitor(clientStream);
+            if (Process.Start(appPath).Responding)
+            {
+                string res = "DCMonitor 启动成功！";
+                byte[] backData = Encoding.ASCII.GetBytes(res);
+                clientStream.Write(backData, 0, backData.Length);
+            }
+        }
+        static void closeDCMonitor(NetworkStream clientStream)
+        {
+            Process[] dc = Process.GetProcessesByName("DCMonitor");
+            foreach (var r in dc) r.Kill();
+            Process[] sfm = Process.GetProcessesByName("SFMcomputer");
+            foreach (var r in sfm) r.Kill();
+            string res = "节点程序已关闭！";
+            byte[] backData = Encoding.ASCII.GetBytes(res);
+            clientStream.Write(backData, 0, backData.Length);
+        }
+        #endregion
+
+        #region 公共函数
         /// <summary>
         /// 判断服务是否存在
         /// </summary>
@@ -109,7 +222,6 @@ namespace AM_Node_Controller
             return false;
         }
 
-
         /// <summary>
         /// 调用CMD
         /// </summary>
@@ -125,7 +237,7 @@ namespace AM_Node_Controller
             CmdProcess.StartInfo.RedirectStandardInput = true;
             CmdProcess.StartInfo.RedirectStandardOutput = true;
             CmdProcess.StartInfo.RedirectStandardError = true;
-            
+
             CmdProcess.Start();
             foreach (string cmd in str)
             {
@@ -163,6 +275,7 @@ namespace AM_Node_Controller
             CmdProcess.Close();//结束  
             */
         }
+        #endregion
     }
 
     class ConsoleWin32Helper
