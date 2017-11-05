@@ -27,12 +27,11 @@ namespace AM_Node_Controller
         static void Main(string[] args)
         {
             ConsoleWin32Helper.init();
-            getAppInfo();
+
             //检测临时目录
             if (!Directory.Exists(tempPath))
                 Directory.CreateDirectory(tempPath);
-
-
+            
             /**
                         //检测服务
                         if (!IsServiceExisted())
@@ -104,7 +103,7 @@ namespace AM_Node_Controller
                         clearTempDIR(clientStream);
                         break;
                     case "getAppInfo":
-                        Console.Read();
+                        getAppInfo(clientStream);
                         break;
                     case "upDateApp":
                         Console.Read();
@@ -119,8 +118,7 @@ namespace AM_Node_Controller
                 }
 
                 //回传消息
-                byte[] backData = Encoding.ASCII.GetBytes("Done! and ending...");
-                clientStream.Write(backData, 0, backData.Length);
+                sendBackMSG(clientStream, "Done! and ending...");
                 clientStream.Close();
             }
         }
@@ -141,8 +139,7 @@ namespace AM_Node_Controller
                 }
             }
             string res = "可用空间：" + freeSpace.ToString("f2") + " GB; 共有：" + totalSize.ToString("f2") + " GB;";
-            byte[] backData = Encoding.ASCII.GetBytes(res);
-            clientStream.Write(backData, 0, backData.Length);
+            sendBackMSG(clientStream, res);
         }
         static void clearTempDIR(NetworkStream clientStream)
         {
@@ -158,29 +155,31 @@ namespace AM_Node_Controller
                 Directory.CreateDirectory(tempPath);
             }
             string res = "节点临时目录已清空！";
-            byte[] backData = Encoding.ASCII.GetBytes(res);
-            clientStream.Write(backData, 0, backData.Length);
+            sendBackMSG(clientStream, res);
         }
-        static void getAppInfo()
+        static void getAppInfo(NetworkStream clientStream)
         {
             FileInfo fi = new FileInfo("c:\\os848618.bin");
             string ye = fi.CreationTime.Year.ToString();
             string mon = fi.CreationTime.Month.ToString();
             string day = fi.CreationTime.Day.ToString();
+
+            string res = "v1.1." + ye.ToString() + mon.ToString() + day.ToString();
+            sendBackMSG(clientStream, res);
         }
         static void upDateApp() { }
-        static void getDCMonitorStatus()
+        static void getDCMonitorStatus(NetworkStream clientStream)
         {
             //获取线程运行状态
             Process[] dc = Process.GetProcessesByName("DCMonitor");
             foreach (var r in dc)
                 if (r.Responding)
-                    Console.WriteLine("DCMonitor运行正常！");
+                    sendBackMSG(clientStream, "DCMonitor运行正常！");
 
             Process[] sfm = Process.GetProcessesByName("SFMcomputer");
             foreach (var r in sfm)
                 if (r.Responding)
-                    Console.WriteLine("SFMcomputer运行正常！");
+                    sendBackMSG(clientStream, "SFMcomputer运行正常！");
         }
         static void reLoadDCMonitor(NetworkStream clientStream)
         {
@@ -188,8 +187,7 @@ namespace AM_Node_Controller
             if (Process.Start(appPath).Responding)
             {
                 string res = "DCMonitor 启动成功！";
-                byte[] backData = Encoding.ASCII.GetBytes(res);
-                clientStream.Write(backData, 0, backData.Length);
+                sendBackMSG(clientStream, res);
             }
         }
         static void closeDCMonitor(NetworkStream clientStream)
@@ -199,8 +197,7 @@ namespace AM_Node_Controller
             Process[] sfm = Process.GetProcessesByName("SFMcomputer");
             foreach (var r in sfm) r.Kill();
             string res = "节点程序已关闭！";
-            byte[] backData = Encoding.ASCII.GetBytes(res);
-            clientStream.Write(backData, 0, backData.Length);
+            sendBackMSG(clientStream, res);
         }
         #endregion
 
@@ -274,6 +271,12 @@ namespace AM_Node_Controller
             CmdProcess.WaitForExit();//等待程序执行完退出进程  
             CmdProcess.Close();//结束  
             */
+        }
+
+        static void sendBackMSG(NetworkStream clientStream, string msg)
+        {
+            byte[] backData = Encoding.ASCII.GetBytes(msg);
+            clientStream.Write(backData, 0, backData.Length);
         }
         #endregion
     }
