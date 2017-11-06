@@ -1,9 +1,0 @@
-C:\code\MEF-TEST\MEF_Test\MEF_FormNote\bin\Debug\MEF_FormNote.exe.config
-C:\code\MEF-TEST\MEF_Test\MEF_FormNote\bin\Debug\MEF_FormNote.exe
-C:\code\MEF-TEST\MEF_Test\MEF_FormNote\bin\Debug\MEF_FormNote.pdb
-C:\code\MEF-TEST\MEF_Test\MEF_FormNote\obj\Debug\MEF_FormNote.csprojResolveAssemblyReference.cache
-C:\code\MEF-TEST\MEF_Test\MEF_FormNote\obj\Debug\MEF_FormNote.Form1.resources
-C:\code\MEF-TEST\MEF_Test\MEF_FormNote\obj\Debug\MEF_FormNote.Properties.Resources.resources
-C:\code\MEF-TEST\MEF_Test\MEF_FormNote\obj\Debug\MEF_FormNote.csproj.GenerateResource.Cache
-C:\code\MEF-TEST\MEF_Test\MEF_FormNote\obj\Debug\MEF_FormNote.exe
-C:\code\MEF-TEST\MEF_Test\MEF_FormNote\obj\Debug\MEF_FormNote.pdb

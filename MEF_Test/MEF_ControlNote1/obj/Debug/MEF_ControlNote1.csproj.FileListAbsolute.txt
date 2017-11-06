@@ -1,6 +1,0 @@
-C:\code\MEF-TEST\MEF_Test\MEF_Master\bin\Debug\plugin\control01\MEF_ControlNote1.exe.config
-C:\code\MEF-TEST\MEF_Test\MEF_Master\bin\Debug\plugin\control01\MEF_ControlNote1.exe
-C:\code\MEF-TEST\MEF_Test\MEF_Master\bin\Debug\plugin\control01\MEF_ControlNote1.pdb
-C:\code\MEF-TEST\MEF_Test\MEF_ControlNote1\obj\Debug\MEF_ControlNote1.csprojResolveAssemblyReference.cache
-C:\code\MEF-TEST\MEF_Test\MEF_ControlNote1\obj\Debug\MEF_ControlNote1.exe
-C:\code\MEF-TEST\MEF_Test\MEF_ControlNote1\obj\Debug\MEF_ControlNote1.pdb

@@ -1,2 +1,0 @@
-qprocess *
-pause>nul

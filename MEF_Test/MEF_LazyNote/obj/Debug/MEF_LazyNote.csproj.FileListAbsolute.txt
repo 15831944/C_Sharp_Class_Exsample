@@ -1,9 +1,0 @@
-C:\code\MEF-TEST\MEF_Test\MEF_LazyNote\obj\Debug\MEF_LazyNote.csprojResolveAssemblyReference.cache
-C:\code\MEF-TEST\MEF_Test\MEF_LazyNote\bin\Debug\MEF_LazyNote.dll
-C:\code\MEF-TEST\MEF_Test\MEF_LazyNote\bin\Debug\MEF_LazyNote.pdb
-C:\code\MEF-TEST\MEF_Test\MEF_LazyNote\bin\Debug\IPlugin.dll
-C:\code\MEF-TEST\MEF_Test\MEF_LazyNote\bin\Debug\IPlugin.pdb
-C:\code\MEF-TEST\MEF_Test\MEF_LazyNote\obj\Debug\MEF_LazyNote.dll
-C:\code\MEF-TEST\MEF_Test\MEF_LazyNote\obj\Debug\MEF_LazyNote.pdb
-C:\code\MEF-TEST\MEF_Test\MEF_Master\bin\Debug\plugin\LazyPluginParts\MEF_LazyNote.dll
-C:\code\MEF-TEST\MEF_Test\MEF_Master\bin\Debug\plugin\LazyPluginParts\MEF_LazyNote.pdb

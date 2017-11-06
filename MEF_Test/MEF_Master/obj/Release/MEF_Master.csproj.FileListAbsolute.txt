@@ -1,8 +1,0 @@
-C:\code\MEF-TEST\MEF_Test\MEF_Master\bin\Release\MEF_Master.exe.config
-C:\code\MEF-TEST\MEF_Test\MEF_Master\bin\Release\MEF_Master.exe
-C:\code\MEF-TEST\MEF_Test\MEF_Master\bin\Release\MEF_Master.pdb
-C:\code\MEF-TEST\MEF_Test\MEF_Master\obj\Release\MEF_Master.Form1.resources
-C:\code\MEF-TEST\MEF_Test\MEF_Master\obj\Release\MEF_Master.Properties.Resources.resources
-C:\code\MEF-TEST\MEF_Test\MEF_Master\obj\Release\MEF_Master.csproj.GenerateResource.Cache
-C:\code\MEF-TEST\MEF_Test\MEF_Master\obj\Release\MEF_Master.exe
-C:\code\MEF-TEST\MEF_Test\MEF_Master\obj\Release\MEF_Master.pdb
