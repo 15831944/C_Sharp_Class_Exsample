@@ -127,7 +127,6 @@ namespace Tiji
             double b = ((p2.z - p1.z) * (p3.x - p1.x) - (p2.x - p1.x) * (p3.z - p1.z));
             double c = ((p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x));
             double d = (0 - (a * p1.x + b * p1.y + c * p1.z));
-
         }
         /// <summary>
         /// 已知三点坐标，求法向量,
