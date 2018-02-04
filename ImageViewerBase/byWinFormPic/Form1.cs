@@ -12,11 +12,11 @@ namespace byWinFormPic
 {
     public partial class Form1 : Form
     {
-        PalyPictuerBox a;
+        PlayPictuerBox a;
         public Form1()
         {
             InitializeComponent();
-            a = new PalyPictuerBox();
+            a = new PlayPictuerBox();
             this.Controls.Add(a);
             a.p += (k) => { this.Text = k; };
         }

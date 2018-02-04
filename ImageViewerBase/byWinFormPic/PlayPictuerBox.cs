@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace byWinFormPic
 {
-    class PalyPictuerBox : PictureBox
+    class PlayPictuerBox : PictureBox
     {
         Rectangle imgRec;
         Rectangle drawRec;
@@ -12,7 +12,7 @@ namespace byWinFormPic
         bool isFull;
         bool isMove;
         public Action<string> p = (a) => { };
-        public PalyPictuerBox()
+        public PlayPictuerBox()
         {
             Dock = DockStyle.Fill;
             BackColor = Color.White;
