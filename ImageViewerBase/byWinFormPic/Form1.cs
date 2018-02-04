@@ -17,13 +17,14 @@ namespace byWinFormPic
         {
             InitializeComponent();
             a = new PlayPictuerBox();
+            a.imageInfo_outPut += (k) => { this.Text = k; };
             this.Controls.Add(a);
-            a.p += (k) => { this.Text = k; };
         }
         private void openImageToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            
             if (DialogResult.OK == openFileDialog1.ShowDialog())
-                a.setImage(openFileDialog1.FileName);
+                a.setImage(openFileDialog1.FileName,new Point(5000,3000));
         }
     }
 }

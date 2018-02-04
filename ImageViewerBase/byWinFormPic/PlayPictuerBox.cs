@@ -11,7 +11,10 @@ namespace byWinFormPic
         Point cleckP;
         bool isFull;
         bool isMove;
-        public Action<string> p = (a) => { };
+        /// <summary>
+        /// 输出图像实时信息
+        /// </summary>
+        public Action<string> imageInfo_outPut = (a) => {/*使此委托不为空*/ };
         public PlayPictuerBox()
         {
             Dock = DockStyle.Fill;
@@ -25,11 +28,19 @@ namespace byWinFormPic
             MouseEnter += (object s, EventArgs e) => { Focus(); };
             MouseWheel += this_MouseWheel;
         }
-        public void setImage(string imgFile)
+        /// <summary>
+        /// 设置图像，及显示方式
+        /// </summary>
+        /// <param name="imgFile">图像路径</param>
+        /// <param name="lookAtPixel">指定一个图像坐标，保持上一幅图像的比例，将坐标对齐到窗口中心，不指定则图像适配到窗口中</param>
+        public void setImage(string imgFile, Point lookAtPixel = new Point())
         {
             Image = Image.FromFile(imgFile);
             imgRec = new Rectangle(new Point(), Image.Size);
-            fixToWindow();
+            if (lookAtPixel.IsEmpty || drawRec.Size.IsEmpty)
+                fixToWindow();
+            else
+                lookAtPoint(lookAtPixel);
         }
         //按下：记录鼠标点击时的窗口坐标
         void this_MouseDown(object sender, MouseEventArgs e)
@@ -48,10 +59,12 @@ namespace byWinFormPic
                 cleckP = e.Location;
                 Refresh();
             }
-            if (Image != null)
+            if (Image != null && drawRec.Width > 0)
             {
-                double zo = 1.0 * Image.Width / drawRec.Width;
-                p($"imgX = {(int)(e.X * zo - drawRec.X * zo + 1)} , imgY = {(int)(e.Y * zo - drawRec.Y * zo + 1)},zoom = {drawRec.Width * 1.0 / Image.Width}");
+                double zo = 1.0 * drawRec.Width / Image.Width;
+                int imgX = (int)(e.X / zo - drawRec.X / zo + 1.5);
+                int imgY = (int)(e.Y / zo - drawRec.Y / zo + 1.5);
+                imageInfo_outPut($"imgX = {imgX} , imgY = {imgY} , zoom = {zo.ToString("f2")} ");
             }
         }
         //弹起：切换光标样式
@@ -61,12 +74,12 @@ namespace byWinFormPic
             Cursor = Cursors.Arrow;
             //范围控制
             if (drawRec.X > Size.Width)//右
-                drawRec.X = Width - drawRec.Size.Width;
+                drawRec.X = Width - drawRec.Width;
             if (drawRec.Y > Size.Height)//下
-                drawRec.Y = Height - drawRec.Size.Height;
-            if (drawRec.X < -drawRec.Size.Width)//左
+                drawRec.Y = Height - drawRec.Height;
+            if (drawRec.X < -drawRec.Width)//左
                 drawRec.X = 0;
-            if (drawRec.Y < -drawRec.Size.Height)//上
+            if (drawRec.Y < -drawRec.Height)//上
                 drawRec.Y = 0;
             Refresh();
 
@@ -80,8 +93,8 @@ namespace byWinFormPic
         void this_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left
-                && e.X > drawRec.X && e.X < drawRec.X + drawRec.Size.Width
-                && e.Y > drawRec.Y && e.Y < drawRec.Y + drawRec.Size.Height)
+                && e.X > drawRec.X && e.X < drawRec.X + drawRec.Width
+                && e.Y > drawRec.Y && e.Y < drawRec.Y + drawRec.Height)
             {
                 if (isFull)
                 {
@@ -112,6 +125,14 @@ namespace byWinFormPic
             drawRec = new Rectangle(newLoc, newSize);
 
             Refresh();
+
+            if (Image != null && drawRec.Width > 0)
+            {
+                double zok = 1.0 * drawRec.Width / Image.Width;
+                int imgX = (int)(e.X / zok - drawRec.X / zok + 1.5);
+                int imgY = (int)(e.Y / zok - drawRec.Y / zok + 1.5);
+                imageInfo_outPut($"imgX = {imgX} , imgY = {imgY} , zoom = {zok.ToString("f2")} ");
+            }
         }
         //重绘
         void this_Paint(object sender, PaintEventArgs e)
@@ -141,7 +162,7 @@ namespace byWinFormPic
                 ///     绘宽 = 图宽 x (this高 / 图高) , 绘高 = this高
                 ///     loc.x = this中心 - 绘宽/2 , loc.y = 0
                 drawRec.Size = new Size((int)(Image.Width * Height / Image.Height * 1.0), Height);
-                drawRec.Location = new Point(Width / 2 - drawRec.Size.Width / 2, 0);
+                drawRec.Location = new Point(Width / 2 - drawRec.Width / 2, 0);
             }
             else
             {
@@ -156,26 +177,39 @@ namespace byWinFormPic
                 ///     绘宽 = this宽 ，绘高 = 图高 x （picBoc宽 / 图宽）
                 ///     loc.x = 0 , loc.y =  h中心 - 绘高/2
                 drawRec.Size = new Size(Width, (int)(Image.Height * Width / Image.Width * 1.0));
-                drawRec.Location = new Point(0, Height / 2 - drawRec.Size.Height / 2);
+                drawRec.Location = new Point(0, Height / 2 - drawRec.Height / 2);
             }
 
             Refresh();
         }
-        //全像素显示
+        //以鼠标点为心中全像素显示
         void fullPixce(Point p)
         {
             if (Image == null) return;
             //点击位置转为图像坐标
-            double zo = 1.0 * Image.Width / drawRec.Size.Width;
-            int imgX = (int)(p.X * zo - drawRec.X * zo);
-            int imgY = (int)(p.Y * zo - drawRec.Y * zo);
+            double zo = 1.0 * drawRec.Width / Image.Width;
+            int imgX = (int)(p.X / zo - drawRec.X / zo);
+            int imgY = (int)(p.Y / zo - drawRec.Y / zo);
 
             //把点击位置移到窗口中心
-            //Point loc = new Point( Size.Width / 2 - imgX,  Size.Height / 2 - imgY);
+            // Point loc = new Point(Size.Width / 2 - imgX, Size.Height / 2 - imgY);
             //以点击位置为中心放大
             Point loc1 = new Point(p.X - imgX, p.Y - imgY);
 
             drawRec = new Rectangle(loc1, Image.Size);
+            Refresh();
+        }
+        //以某点为中心显示
+        void lookAtPoint(Point p)
+        {
+            ///drawRec size 不变
+            ///drawRec loc 移动，使输入点对齐窗体中心或某点
+            ///这里 p drawRec 都不为空
+           
+            if (Image == null) return;
+            double zo = 1.0 * drawRec.Width / Image.Width;
+            Point loc1 = new Point(Width / 2 - (int)(p.X * zo), Height / 2 - (int)(p.Y * zo));
+            drawRec = new Rectangle(loc1, drawRec.Size);
             Refresh();
         }
     }
