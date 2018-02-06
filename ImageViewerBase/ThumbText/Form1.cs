@@ -16,8 +16,8 @@ namespace ThumbText
     public partial class Form1 : Form
     {
         int ii;
-        int picBoxSize = 128;
-        int ThumbSize = 128;
+        int picBoxSize = 256;
+        int ThumbSize = 256;
         List<string> photos = new List<string>();
         public Form1()
         {
@@ -41,31 +41,8 @@ namespace ThumbText
             upDataThrmMaps();
         }
 
+
         void creatPicBoxes()
-        {
-            PictureBox abox = new PictureBox()
-            {
-                BackColor = SystemColors.ScrollBar,
-                BackgroundImageLayout = ImageLayout.Zoom,
-                SizeMode = PictureBoxSizeMode.Zoom,
-                Margin = new Padding(2),
-                Size = new Size(picBoxSize, picBoxSize)
-            };
-            abox.MouseClick += Abox_MouseClick;
-            abox.MouseDoubleClick += Abox_MouseDoubleClick;
-            for (int i = 0; i < photos.Count; i++)
-            {
-                string photoPath = photos[i];
-                //如果已存在，则返回此实例
-                if (flowLayoutPanel1.Controls.ContainsKey(photoPath))
-                    abox = flowLayoutPanel1.Controls[photoPath] as PictureBox;
-                else
-                    abox.Name = photoPath;
-                flowLayoutPanel1.Controls.Add(abox);
-            }
-        }
-        /**
-                 void creatPicBoxes()
         {
             PictureBox abox = null;
             for (int i = 0; i < photos.Count; i++)
@@ -91,20 +68,20 @@ namespace ThumbText
                 flowLayoutPanel1.Controls.Add(abox);
             }
         }
-             */
+
         private void Abox_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            throw new NotImplementedException();
+
         }
 
         private void Abox_MouseClick(object sender, MouseEventArgs e)
         {
-            throw new NotImplementedException();
+
         }
 
         #endregion
 
-        
+
         #region ThumbMap
         Thread getThumbMap_SubThread;
         void upDataThrmMaps()
@@ -113,7 +90,6 @@ namespace ThumbText
             {
                 getThumbMap_SubThread = new Thread(new ThreadStart(() => getThumbMapFromImage(callback_setToPic)));
                 getThumbMap_SubThread.Start();
-                MessageBox.Show("开始提取缩略图");
             }
             else
                 MessageBox.Show("正在提取缩略图");
@@ -124,7 +100,7 @@ namespace ThumbText
             {
                 int i = ii;//界面点击会改变此值
                 string imgPaht = photos[i];
-                string thumbPath = getThumbPath(imgPaht, "");
+                string thumbPath = getThumbPath(imgPaht, "hh");
                 //如果thumbPath不存在则创建缩略图
                 if (!File.Exists(thumbPath))
                 {
