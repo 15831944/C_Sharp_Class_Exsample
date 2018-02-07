@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Windows.Forms.Form;
 
 namespace ThumbText
 {
@@ -18,8 +17,9 @@ namespace ThumbText
         /// 图标大小
         /// </summary>
         public int picBoxSize { set; get; }
+
         /// <summary>
-        /// 缩略图大小
+        /// 缩略图大小,如果不需要生成大缩略图，设置为0
         /// </summary>
         public int ThumbMapSize { set; get; }
         /// <summary>
@@ -31,7 +31,7 @@ namespace ThumbText
         /// </summary>
         public Dictionary<string, PictureBox> selected { set; get; }
         /// <summary>
-        /// 缓存路径
+        /// 缓存路径,不保存本地缓存设置为 null，默认%temp%
         /// </summary>
         public string TempDir { set; get; }
         /// <summary>
@@ -45,10 +45,11 @@ namespace ThumbText
         Thread getThumbMap_SubThread;
         int ii;
         #endregion
+
         /// <summary>
         /// 初始化一个缩略图流览器对
         /// </summary>
-        /// <param name="c"></param>
+        /// <param name="c">父对象的Controls</param>
         public ThumbViewer(ControlCollection c)
         {
             #region Buttons
@@ -89,9 +90,10 @@ namespace ThumbText
             #endregion
 
             picBoxSize = 128;
-            ThumbMapSize = 128;
+            ThumbMapSize = 512;
             photos = new List<string>();
             selected = new Dictionary<string, PictureBox>();
+            TempDir = Path.GetTempPath();
         }
 
         #region 逻辑
@@ -134,60 +136,113 @@ namespace ThumbText
         {
             if (getThumbMap_SubThread == null || getThumbMap_SubThread.ThreadState == ThreadState.Stopped)
             {
-                getThumbMap_SubThread = new Thread(new ThreadStart(() => getThumbMapFromImage(callback_setToPic)));
+                getThumbMap_SubThread = new Thread(new ThreadStart(() => getThumbMapFromImage(callback_setPathToPic, callback_setIMGToPic)));
                 getThumbMap_SubThread.Start();
             }
-            else
-                MessageBox.Show("正在提取缩略图");
         }
-        void getThumbMapFromImage(Func<string, string, bool> setToPic)
+        void getThumbMapFromImage(Func<string, string, bool> setPathToPic, Func<string, Image, bool> setImgToPic)
         {
             for (ii = 0; ii < photos.Count; ii++)
             {
                 int i = ii;//界面点击会改变此值
                 string imgPaht = photos[i];
-                string thumbPath = getThumbPath(imgPaht);
-                //如果thumbPath不存在则创建缩略图
-                if (!File.Exists(thumbPath))
+                string smallThumb = getThumbPath(imgPaht, true);
+
+                if (smallThumb != null)
                 {
-                    Image aMap = Image.FromFile(imgPaht);
-                    //缩略图尺寸
-                    int thuWidth = aMap.Width > aMap.Height ? ThumbMapSize : ThumbMapSize * aMap.Height / aMap.Width;
-                    int thuHieght = aMap.Width > aMap.Height ? ThumbMapSize * aMap.Height / aMap.Width : ThumbMapSize;
-                    //创建缩略图
-                    Image thumbMap = aMap.GetThumbnailImage(thuWidth, thuHieght, null, new IntPtr());
-                    //创建文件夹，保存缩略图
-                    if (!Directory.Exists(Path.GetDirectoryName(thumbPath)))
-                        Directory.CreateDirectory(Path.GetDirectoryName(thumbPath));
-                    try { thumbMap.Save(thumbPath, ImageFormat.Jpeg); } catch (Exception ex) { MessageBox.Show(ex.Message); };
-                    aMap.Dispose();
-                    thumbMap.Dispose();
+                    //保存本地缓存
+
+                    if (!File.Exists(smallThumb))
+                    {
+                        //如果thumbPath不存在则创建缩略图
+
+                        Image aMap = Image.FromFile(imgPaht);
+                        //缩略图尺寸
+                        int thuWidth = aMap.Width > aMap.Height ? picBoxSize : picBoxSize * aMap.Height / aMap.Width;
+                        int thuHieght = aMap.Width > aMap.Height ? picBoxSize * aMap.Height / aMap.Width : picBoxSize;
+
+                        //创建缩略图
+                        Image thumbMap = aMap.GetThumbnailImage(thuWidth, thuHieght, null, new IntPtr());
+
+                        //创建文件夹，保存缩略图
+                        if (!Directory.Exists(Path.GetDirectoryName(smallThumb)))
+                            Directory.CreateDirectory(Path.GetDirectoryName(smallThumb));
+                        try { thumbMap.Save(smallThumb, ImageFormat.Jpeg); } catch (Exception ex) { MessageBox.Show(ex.Message); };
+
+                        aMap.Dispose();
+                        thumbMap.Dispose();
+                        GC.Collect();
+                    }
+
+                    //回调返回false,说明主线程断了，则break掉此线程的循环
+                    if (!setPathToPic(imgPaht, smallThumb)) break;
+
+                    //创建大图
+                    if (ThumbMapSize > 0)
+                        new Thread(new ThreadStart(() => { setPathToPic(imgPaht, drawBigThumb(imgPaht)); })).Start();
                 }
-                //回调返回false,说明主线程断了，则break掉此线程的循环
-                if (!setToPic(imgPaht, thumbPath)) break;
+                else
+                {
+                    //不保存本地缓存
+
+                    Image aMap = Image.FromFile(imgPaht);
+                    int thuWidth = aMap.Width > aMap.Height ? picBoxSize : picBoxSize * aMap.Height / aMap.Width;
+                    int thuHieght = aMap.Width > aMap.Height ? picBoxSize * aMap.Height / aMap.Width : picBoxSize;
+                    Image thumbMap = aMap.GetThumbnailImage(thuWidth, thuHieght, null, new IntPtr());
+                    aMap.Dispose(); GC.Collect();
+                    if (!setImgToPic(imgPaht, thumbMap)) break;
+                    if (ThumbMapSize > 0)
+                        new Thread(new ThreadStart(() => { setImgToPic(imgPaht, drawBigIMGThumb(imgPaht)); })).Start();
+                }
             }
         }
-        void drawBigThumb(string imgFile)
+        string drawBigThumb(string imgFile)
         {
+            string bigThumb = getThumbPath(imgFile, false);
             Image image = Image.FromFile(imgFile);
-            Rectangle thumbRec = new Rectangle(0, 0, 44, 55);
-            Bitmap bmp = new Bitmap(thumbRec.Width, thumbRec.Height);
+            //缩略图尺寸
+            int thuWidth = image.Width > image.Height ? ThumbMapSize : ThumbMapSize * image.Height / image.Width;
+            int thuHieght = image.Width > image.Height ? ThumbMapSize * image.Height / image.Width : ThumbMapSize;
+
+            Bitmap bmp = new Bitmap(thuWidth, thuHieght);
             Graphics gr = Graphics.FromImage(bmp);
             {
                 gr.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
                 gr.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
                 gr.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.High;
             }
+            Rectangle thumbRec = new Rectangle(0, 0, thuWidth, thuHieght);
             gr.DrawImage(image, thumbRec, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel);
-            bmp.Save("", ImageFormat.Jpeg);
+            bmp.Save(bigThumb, ImageFormat.Jpeg);
 
             bmp.Dispose();
             image.Dispose();
             GC.Collect();
+            return bigThumb;
         }
+        Image drawBigIMGThumb(string imgFile)
+        {
+            string bigThumb = getThumbPath(imgFile, false);
+            Image image = Image.FromFile(imgFile);
+            //缩略图尺寸
+            int thuWidth = image.Width > image.Height ? ThumbMapSize : ThumbMapSize * image.Height / image.Width;
+            int thuHieght = image.Width > image.Height ? ThumbMapSize * image.Height / image.Width : ThumbMapSize;
 
+            Bitmap bmp = new Bitmap(thuWidth, thuHieght);
+            Graphics gr = Graphics.FromImage(bmp);
+            {
+                gr.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                gr.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+                gr.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.High;
+            }
+            Rectangle thumbRec = new Rectangle(0, 0, thuWidth, thuHieght);
+            gr.DrawImage(image, thumbRec, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel);
 
-        bool callback_setToPic(string imgPath, string ThumbPath)
+            image.Dispose();
+            GC.Collect();
+            return bmp as Image;
+        }
+        bool callback_setPathToPic(string imgPath, string ThumbPath)
         {
             bool res = false;
             try
@@ -198,30 +253,30 @@ namespace ThumbText
             catch (Exception ex) { MessageBox.Show(ex.Message); }
             return res;
         }
-        bool callback_setToPic(string imgPath, Image thMap)
+        bool callback_setIMGToPic(string imgPath, Image ThumbPath)
         {
             bool res = false;
             try
             {
-                (Controls[imgPath] as PictureBox).Image = thMap;
+                (Controls[imgPath] as PictureBox).Image = ThumbPath;
                 res = true;
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
             return res;
         }
-        string getThumbPath(string imgPaht)
+        string getThumbPath(string imgPaht, bool s)
         {
-            //根目录，判断用户是否设置，如果没有，就用系统%temp%目录
-            string root = TempDir ?? Path.GetTempPath();
+            //用户设置为null,不保存缓存文件
+            if (TempDir == null) return null;
 
             //Project目录
-            root = proName == null ? Path.Combine(TempDir, "AM_Thumbnail") : Path.Combine(TempDir, "AM_Thumbnail", proName);
+            string root = proName == null ? Path.Combine(TempDir, "AM_Thumbnail") : Path.Combine(TempDir, "AM_Thumbnail", proName);
 
             //照片的上一级目录 D:/dir/文件名.jpg
             string dir = Path.GetFileName(Path.GetDirectoryName(imgPaht));
 
             //文件名.jpg
-            string imgName = Path.GetFileNameWithoutExtension(imgPaht) + ".jpg";
+            string imgName = Path.GetFileNameWithoutExtension(imgPaht) + (s ? "_s.jpg" : "_b.jpg");
 
             //合并路径
             return Path.Combine(root, dir, imgName);

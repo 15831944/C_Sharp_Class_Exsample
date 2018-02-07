@@ -27,10 +27,10 @@ namespace ThumbText
 
                 tv.photos = openFileDialog1.FileNames.ToList();
                 tv.picBoxSize = 128;
-                tv.ThumbMapSize = 128;
-                tv.TempDir = @"D:\temp";
-                tv.proName = "test99";
-
+                tv.ThumbMapSize = 512;
+                //tv.TempDir = @"C:\temp\aaa\";
+                //tv.proName = "test99";
+                tv.TempDir = null;
                 tv.upDataItems();
             }
         }
