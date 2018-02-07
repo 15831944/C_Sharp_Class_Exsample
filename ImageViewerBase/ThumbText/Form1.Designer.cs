@@ -28,21 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // flowLayoutPanel1
-            // 
-            this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(0, 43);
-            this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
-            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(1564, 1151);
-            this.flowLayoutPanel1.TabIndex = 0;
             // 
             // menuStrip1
             // 
@@ -51,15 +41,14 @@
             this.toolStripMenuItem1});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Padding = new System.Windows.Forms.Padding(12, 4, 0, 4);
-            this.menuStrip1.Size = new System.Drawing.Size(1564, 43);
+            this.menuStrip1.Size = new System.Drawing.Size(592, 24);
             this.menuStrip1.TabIndex = 1;
             this.menuStrip1.Text = "menuStrip1";
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(68, 35);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(35, 20);
             this.toolStripMenuItem1.Text = "123";
             this.toolStripMenuItem1.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
             // 
@@ -69,12 +58,10 @@
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 24F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1564, 1194);
-            this.Controls.Add(this.flowLayoutPanel1);
+            this.ClientSize = new System.Drawing.Size(592, 590);
             this.Controls.Add(this.menuStrip1);
-            this.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.Name = "Form1";
             this.Text = "Form1";
             this.menuStrip1.ResumeLayout(false);
@@ -84,9 +71,8 @@
 
         }
 
-        #endregion
 
-        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
+        #endregion
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
