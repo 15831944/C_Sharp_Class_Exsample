@@ -14,43 +14,62 @@ namespace ThumbText
     class ThumbViewer : FlowLayoutPanel
     {
         /// <summary>
-        /// 图标大小
+        /// 图标大小，同时也是图标缩放的最小值
         /// </summary>
-        public int picBoxSize { set; get; }
+        public int vb_picBoxSize { set; get; }
         /// <summary>
-        /// 缩略图大小,如果不需要生成大缩略图，设置为0
+        /// 缩略图大小，同时也是图标缩放的最大值。如果不需要生成大缩略图设置为0，同时，此值小于picBoxSize时图标也不能缩放
         /// </summary>
-        public int ThumbMapSize { set; get; }
+        public int vb_ThumbMapSize
+        {
+            set
+            {
+                if (value > vb_picBoxSize)
+                {
+                    lab_1.Visible = true;
+                    lab_2.Visible = true;
+                }
+                else
+                {
+                    lab_1.Visible = false;
+                    lab_2.Visible = false;
+                }
+                _thumbMapSize = value;
+            }
+            get { return _thumbMapSize; }
+        }
         /// <summary>
-        /// 成果集合
+        /// 需要显示的照片集合
         /// </summary>
-        public List<string> photos { set; get; }
+        public List<string> vb_Photos { set; get; }
         /// <summary>
         /// 选择集
         /// </summary>
-        public Dictionary<string, PictureBox> selected { set; get; }
+        public Dictionary<string, PictureBox> vb_Selected { set; get; }
         /// <summary>
         /// 缓存路径,不保存本地缓存设置为 null，默认%temp%
         /// </summary>
-        public string TempDir { set; get; }
+        public string vb_TempDir { set; get; }
         /// <summary>
         /// 项目名称，参于定义缩略图保存目录，可以为空
         /// </summary>
-        public string proName { set; get; }
+        public string vb_ProName { set; get; }
+
         /// <summary>
         /// 触发图标的双击事件
         /// </summary>
-        public Action<object, MouseEventArgs> itemDoubleClick = (a, e) => { };
+        public Action<object, MouseEventArgs> vb_ItemDoubleClick = (a, e) => { };
         /// <summary>
         ///  触发图标的单击事件
         /// </summary>
-        public Action<object, MouseEventArgs> itemClick = (a, e) => { };
+        public Action<object, MouseEventArgs> vb_ItemClick = (a, e) => { };
 
         #region 私有
         Label lab_1;
         Label lab_2;
         Thread getThumbMap_SubThread;
         int ii;
+        int _thumbMapSize;
         #endregion
 
         /// <summary>
@@ -96,16 +115,18 @@ namespace ThumbText
             c.Add(this);
             #endregion
 
-            picBoxSize = 128;
-            ThumbMapSize = 512;
-            photos = new List<string>();
-            selected = new Dictionary<string, PictureBox>();
-            TempDir = Path.GetTempPath();
+            vb_picBoxSize = 128;
+            vb_ThumbMapSize = 512;
+            vb_Photos = new List<string>();
+            vb_Selected = new Dictionary<string, PictureBox>();
+            vb_TempDir = Path.GetTempPath();
         }
 
         #region 逻辑
-        //设置要显示的照片
-        public void upDataItems()
+        /// <summary>
+        /// 设置photos以后，调用此函数，更新显示
+        /// </summary>
+        public void vb_UpdataItems()
         {
             Controls.Clear();
             creatPicBoxes();
@@ -115,9 +136,9 @@ namespace ThumbText
         void creatPicBoxes()
         {
             PictureBox abox = null;
-            for (int i = 0; i < photos.Count; i++)
+            for (int i = 0; i < vb_Photos.Count; i++)
             {
-                string photoPath = photos[i];
+                string photoPath = vb_Photos[i];
                 //如果已存在，则返回此实例
                 if (Controls.ContainsKey(photoPath))
                     abox = Controls[photoPath] as PictureBox;
@@ -130,7 +151,7 @@ namespace ThumbText
                         SizeMode = PictureBoxSizeMode.Zoom,
                         Margin = new Padding(2),
                         Name = photoPath,
-                        Size = new Size(picBoxSize, picBoxSize)
+                        Size = new Size(vb_picBoxSize, vb_picBoxSize)
                     };
                     abox.MouseClick += Abox_MouseClick;
                     abox.MouseDoubleClick += Abox_MouseDoubleClick;
@@ -149,10 +170,10 @@ namespace ThumbText
         }
         void getThumbMapFromImage(Func<string, string, bool> setPathToPic, Func<string, Image, bool> setImgToPic)
         {
-            for (ii = 0; ii < photos.Count; ii++)
+            for (ii = 0; ii < vb_Photos.Count; ii++)
             {
                 int i = ii;//界面点击会改变此值
-                string imgPaht = photos[i];
+                string imgPaht = vb_Photos[i];
                 string smallThumb = getThumbPath(imgPaht, true);
 
                 if (smallThumb != null)
@@ -165,8 +186,8 @@ namespace ThumbText
 
                         Image aMap = Image.FromFile(imgPaht);
                         //缩略图尺寸
-                        int thuWidth = aMap.Width > aMap.Height ? picBoxSize : picBoxSize * aMap.Height / aMap.Width;
-                        int thuHieght = aMap.Width > aMap.Height ? picBoxSize * aMap.Height / aMap.Width : picBoxSize;
+                        int thuWidth = aMap.Width > aMap.Height ? vb_picBoxSize : vb_picBoxSize * aMap.Height / aMap.Width;
+                        int thuHieght = aMap.Width > aMap.Height ? vb_picBoxSize * aMap.Height / aMap.Width : vb_picBoxSize;
 
                         //创建缩略图
                         Image thumbMap = aMap.GetThumbnailImage(thuWidth, thuHieght, null, new IntPtr());
@@ -185,7 +206,7 @@ namespace ThumbText
                     if (!setPathToPic(imgPaht, smallThumb)) break;
 
                     //创建大图
-                    if (ThumbMapSize > 0)
+                    if (vb_ThumbMapSize > 0)
                         new Thread(new ThreadStart(() => { setPathToPic(imgPaht, drawBigThumb(imgPaht)); })).Start();
                 }
                 else
@@ -193,12 +214,12 @@ namespace ThumbText
                     //不保存本地缓存
 
                     Image aMap = Image.FromFile(imgPaht);
-                    int thuWidth = aMap.Width > aMap.Height ? picBoxSize : picBoxSize * aMap.Height / aMap.Width;
-                    int thuHieght = aMap.Width > aMap.Height ? picBoxSize * aMap.Height / aMap.Width : picBoxSize;
+                    int thuWidth = aMap.Width > aMap.Height ? vb_picBoxSize : vb_picBoxSize * aMap.Height / aMap.Width;
+                    int thuHieght = aMap.Width > aMap.Height ? vb_picBoxSize * aMap.Height / aMap.Width : vb_picBoxSize;
                     Image thumbMap = aMap.GetThumbnailImage(thuWidth, thuHieght, null, new IntPtr());
                     aMap.Dispose(); GC.Collect();
                     if (!setImgToPic(imgPaht, thumbMap)) break;
-                    if (ThumbMapSize > 0)
+                    if (vb_ThumbMapSize > 0)
                         new Thread(new ThreadStart(() => { setImgToPic(imgPaht, drawBigIMGThumb(imgPaht)); })).Start();
                 }
             }
@@ -213,8 +234,8 @@ namespace ThumbText
             string bigThumb = getThumbPath(imgFile, false);
             Image image = Image.FromFile(imgFile);
             //缩略图尺寸
-            int thuWidth = image.Width > image.Height ? ThumbMapSize : ThumbMapSize * image.Height / image.Width;
-            int thuHieght = image.Width > image.Height ? ThumbMapSize * image.Height / image.Width : ThumbMapSize;
+            int thuWidth = image.Width > image.Height ? vb_ThumbMapSize : vb_ThumbMapSize * image.Height / image.Width;
+            int thuHieght = image.Width > image.Height ? vb_ThumbMapSize * image.Height / image.Width : vb_ThumbMapSize;
 
             Bitmap bmp = new Bitmap(thuWidth, thuHieght);
             Graphics gr = Graphics.FromImage(bmp);
@@ -242,8 +263,8 @@ namespace ThumbText
             string bigThumb = getThumbPath(imgFile, false);
             Image image = Image.FromFile(imgFile);
             //缩略图尺寸
-            int thuWidth = image.Width > image.Height ? ThumbMapSize : ThumbMapSize * image.Height / image.Width;
-            int thuHieght = image.Width > image.Height ? ThumbMapSize * image.Height / image.Width : ThumbMapSize;
+            int thuWidth = image.Width > image.Height ? vb_ThumbMapSize : vb_ThumbMapSize * image.Height / image.Width;
+            int thuHieght = image.Width > image.Height ? vb_ThumbMapSize * image.Height / image.Width : vb_ThumbMapSize;
 
             Bitmap bmp = new Bitmap(thuWidth, thuHieght);
             Graphics gr = Graphics.FromImage(bmp);
@@ -296,10 +317,10 @@ namespace ThumbText
         string getThumbPath(string imgPaht, bool s)
         {
             //用户设置为null,不保存缓存文件
-            if (TempDir == null) return null;
+            if (vb_TempDir == null) return null;
 
             //Project目录
-            string root = proName == null ? Path.Combine(TempDir, "AM_Thumbnail") : Path.Combine(TempDir, "AM_Thumbnail", proName);
+            string root = vb_ProName == null ? Path.Combine(vb_TempDir, "AM_Thumbnail") : Path.Combine(vb_TempDir, "AM_Thumbnail", vb_ProName);
 
             //照片的上一级目录 D:/dir/文件名.jpg
             string dir = Path.GetFileName(Path.GetDirectoryName(imgPaht));
@@ -319,7 +340,7 @@ namespace ThumbText
             {
                 item.BackColor = SystemColors.ScrollBar;
             }
-            foreach (PictureBox item in selected.Values)
+            foreach (PictureBox item in vb_Selected.Values)
             {
                 item.BackColor = Color.DarkGray;
             }
@@ -332,7 +353,7 @@ namespace ThumbText
         private void Abox_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             // Size = new Size(400, Size.Height);
-            itemDoubleClick(sender, e);
+            vb_ItemDoubleClick(sender, e);
         }
         //点击
         private void Abox_MouseClick(object sender, MouseEventArgs e)
@@ -348,10 +369,10 @@ namespace ThumbText
             //Ctrl 加减选
             if (ModifierKeys == Keys.Control)
             {
-                if (selected.ContainsKey(pic.Name))
-                    selected.Remove(pic.Name);
+                if (vb_Selected.ContainsKey(pic.Name))
+                    vb_Selected.Remove(pic.Name);
                 else
-                    selected[pic.Name] = pic;
+                    vb_Selected[pic.Name] = pic;
             }
             //shift 范围选
             else if (ModifierKeys == Keys.Shift)
@@ -360,25 +381,25 @@ namespace ThumbText
                 /// 选择集中的第一个成员是否小于当前选择对象
                 /// 是，说明向后选择，选择集中的第一个成员为start
                 /// 否，说明从后向前选，选择集中的最后一个成员为start
-                int start = Controls.GetChildIndex(selected.First().Value) < picID ?
-                    Controls.GetChildIndex(selected.First().Value) :
-                    Controls.GetChildIndex(selected.Last().Value);
+                int start = Controls.GetChildIndex(vb_Selected.First().Value) < picID ?
+                    Controls.GetChildIndex(vb_Selected.First().Value) :
+                    Controls.GetChildIndex(vb_Selected.Last().Value);
                 int i = start < picID ? start : picID;
                 int ii = start > picID ? start : picID;
-                selected.Clear();
+                vb_Selected.Clear();
                 for (; i <= ii; i++)
                 {
                     PictureBox a = Controls[i] as PictureBox;
-                    selected[a.Name] = a;
+                    vb_Selected[a.Name] = a;
                 }
             }
             else
             {
-                selected.Clear();
-                selected[pic.Name] = pic;
+                vb_Selected.Clear();
+                vb_Selected[pic.Name] = pic;
             }
             updataSelection();
-            itemClick(sender, e);
+            vb_ItemClick(sender, e);
         }
         //滚轮
         private void ThumbViewer_MouseWheel(object sender, MouseEventArgs e)
@@ -392,7 +413,7 @@ namespace ThumbText
         //未点到照片，清空选择
         private void ThumbViewer_MouseClick(object sender, MouseEventArgs e)
         {
-            selected.Clear();
+            vb_Selected.Clear();
             updataSelection();
         }
         //放大缩小图标
@@ -400,7 +421,7 @@ namespace ThumbText
         {
             foreach (PictureBox pic in Controls)
             {
-                if (pic.Size.Width < 64)
+                if (pic.Size.Width < vb_picBoxSize)
                 {
                     lab_2.ForeColor = Color.Gray;
                     break;
@@ -413,7 +434,7 @@ namespace ThumbText
         {
             foreach (PictureBox pic in Controls)
             {
-                if (pic.Size.Width > 600)
+                if (pic.Size.Width > vb_ThumbMapSize)
                 {
                     lab_1.ForeColor = Color.Gray;
                     break;

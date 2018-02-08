@@ -28,21 +28,21 @@ namespace ThumbText
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 tv = new ThumbViewer(Controls);
-                tv.itemDoubleClick += Tv_MouseDoubleClick;
-                tv.photos = openFileDialog1.FileNames.ToList();
-                tv.picBoxSize = 128;
-                tv.ThumbMapSize = 512;
+                tv.vb_ItemDoubleClick += Tv_MouseDoubleClick;
+                tv.vb_Photos = openFileDialog1.FileNames.ToList();
+                tv.vb_picBoxSize = 128;
+                tv.vb_ThumbMapSize = 0;
                 //tv.TempDir = @"C:\temp\aaa\";
                 //tv.proName = "test99";
-                tv.TempDir = null;
-                tv.upDataItems();
+                tv.vb_TempDir = null;
+                tv.vb_UpdataItems();
             }
         }
 
 
         private void Tv_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            this.Text = tv.selected.First().Key;
+            this.Text = tv.vb_Selected.First().Key;
         }
     }
 }
