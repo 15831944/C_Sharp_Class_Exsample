@@ -17,7 +17,6 @@ namespace ThumbText
         /// 图标大小
         /// </summary>
         public int picBoxSize { set; get; }
-
         /// <summary>
         /// 缩略图大小,如果不需要生成大缩略图，设置为0
         /// </summary>
@@ -38,6 +37,14 @@ namespace ThumbText
         /// 项目名称，参于定义缩略图保存目录，可以为空
         /// </summary>
         public string proName { set; get; }
+        /// <summary>
+        /// 触发图标的双击事件
+        /// </summary>
+        public Action<object, MouseEventArgs> itemDoubleClick = (a, e) => { };
+        /// <summary>
+        ///  触发图标的单击事件
+        /// </summary>
+        public Action<object, MouseEventArgs> itemClick = (a, e) => { };
 
         #region 私有
         Label lab_1;
@@ -196,6 +203,11 @@ namespace ThumbText
                 }
             }
         }
+        /// <summary>
+        /// 绘制高精缩略图，返回其路径，保存本地缓存时用
+        /// </summary>
+        /// <param name="imgFile"></param>
+        /// <returns></returns>
         string drawBigThumb(string imgFile)
         {
             string bigThumb = getThumbPath(imgFile, false);
@@ -220,6 +232,11 @@ namespace ThumbText
             GC.Collect();
             return bigThumb;
         }
+        /// <summary>
+        /// 绘制高精缩略图，返回其image实例，不保存本地缓存时用
+        /// </summary>
+        /// <param name="imgFile"></param>
+        /// <returns></returns>
         Image drawBigIMGThumb(string imgFile)
         {
             string bigThumb = getThumbPath(imgFile, false);
@@ -242,6 +259,12 @@ namespace ThumbText
             GC.Collect();
             return bmp as Image;
         }
+        /// <summary>
+        /// 回调，把缩略图赋值给picBox
+        /// </summary>
+        /// <param name="imgPath"></param>
+        /// <param name="ThumbPath"></param>
+        /// <returns></returns>
         bool callback_setPathToPic(string imgPath, string ThumbPath)
         {
             bool res = false;
@@ -264,6 +287,12 @@ namespace ThumbText
             catch (Exception ex) { MessageBox.Show(ex.Message); }
             return res;
         }
+        /// <summary>
+        /// 格式化缩略图保存目录
+        /// </summary>
+        /// <param name="imgPaht"></param>
+        /// <param name="s"></param>
+        /// <returns></returns>
         string getThumbPath(string imgPaht, bool s)
         {
             //用户设置为null,不保存缓存文件
@@ -281,6 +310,9 @@ namespace ThumbText
             //合并路径
             return Path.Combine(root, dir, imgName);
         }
+        /// <summary>
+        /// 更新成员选择状态
+        /// </summary>
         void updataSelection()
         {
             foreach (PictureBox item in Controls)
@@ -299,7 +331,8 @@ namespace ThumbText
         //双击
         private void Abox_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            Size = new Size(400, Size.Height);
+            // Size = new Size(400, Size.Height);
+            itemDoubleClick(sender, e);
         }
         //点击
         private void Abox_MouseClick(object sender, MouseEventArgs e)
@@ -345,6 +378,7 @@ namespace ThumbText
                 selected[pic.Name] = pic;
             }
             updataSelection();
+            itemClick(sender, e);
         }
         //滚轮
         private void ThumbViewer_MouseWheel(object sender, MouseEventArgs e)
