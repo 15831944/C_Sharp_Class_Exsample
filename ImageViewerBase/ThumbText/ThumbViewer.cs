@@ -232,25 +232,28 @@ namespace ThumbText
         string drawBigThumb(string imgFile)
         {
             string bigThumb = getThumbPath(imgFile, false);
-            Image image = Image.FromFile(imgFile);
-            //缩略图尺寸
-            int thuWidth = image.Width > image.Height ? vb_ThumbMapSize : vb_ThumbMapSize * image.Height / image.Width;
-            int thuHieght = image.Width > image.Height ? vb_ThumbMapSize * image.Height / image.Width : vb_ThumbMapSize;
-
-            Bitmap bmp = new Bitmap(thuWidth, thuHieght);
-            Graphics gr = Graphics.FromImage(bmp);
+            if (File.Exists(bigThumb))
             {
-                gr.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-                gr.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
-                gr.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.High;
-            }
-            Rectangle thumbRec = new Rectangle(0, 0, thuWidth, thuHieght);
-            gr.DrawImage(image, thumbRec, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel);
-            bmp.Save(bigThumb, ImageFormat.Jpeg);
+                Image image = Image.FromFile(imgFile);
+                //缩略图尺寸
+                int thuWidth = image.Width > image.Height ? vb_ThumbMapSize : vb_ThumbMapSize * image.Height / image.Width;
+                int thuHieght = image.Width > image.Height ? vb_ThumbMapSize * image.Height / image.Width : vb_ThumbMapSize;
 
-            bmp.Dispose();
-            image.Dispose();
-            GC.Collect();
+                Bitmap bmp = new Bitmap(thuWidth, thuHieght);
+                Graphics gr = Graphics.FromImage(bmp);
+                {
+                    gr.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                    gr.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+                    gr.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.High;
+                }
+                Rectangle thumbRec = new Rectangle(0, 0, thuWidth, thuHieght);
+                gr.DrawImage(image, thumbRec, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel);
+                bmp.Save(bigThumb, ImageFormat.Jpeg);
+
+                bmp.Dispose();
+                image.Dispose();
+                GC.Collect();
+            }
             return bigThumb;
         }
         /// <summary>
