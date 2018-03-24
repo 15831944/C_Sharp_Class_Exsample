@@ -1,5 +1,4 @@
-﻿using OSGeo.GDAL;
-using OSGeo.OGR;
+﻿
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -19,8 +18,6 @@ namespace AutoColor
         public Form1()
         {
             InitializeComponent();
-            Gdal.AllRegister();
-            Ogr.RegisterAll();
         }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
@@ -47,18 +44,18 @@ namespace AutoColor
 
         void sejie()
         {
-            Dataset ds = Gdal.Open(@"E:\test\DSC00661.JPG", Access.GA_ReadOnly);
-            int xSize = ds.RasterXSize;
-            int ySize = ds.RasterYSize;
-            List<int[]> bufs = new List<int[]>();
-            for (int band = 0; band < ds.RasterCount; band++)
-            {
-                int[] buf = new int[xSize * ySize];
-                ds.GetRasterBand(band + 1).ReadRaster(0, 0, xSize, ySize, buf, xSize, ySize, 0, 0);
-                bufs.Add(buf);
-            }
-            numbers(bufs);
-            ds.Dispose();
+         //   Dataset ds = Gdal.Open(@"E:\test\DSC00661.JPG", Access.GA_ReadOnly);
+            //int xSize = ds.RasterXSize;
+            //int ySize = ds.RasterYSize;
+            //List<int[]> bufs = new List<int[]>();
+            //for (int band = 0; band < ds.RasterCount; band++)
+            //{
+            //    int[] buf = new int[xSize * ySize];
+            //    ds.GetRasterBand(band + 1).ReadRaster(0, 0, xSize, ySize, buf, xSize, ySize, 0, 0);
+            //    bufs.Add(buf);
+            //}
+            //numbers(bufs);
+            //ds.Dispose();
         }
         void numbers(List<int[]> bufs)
         {
