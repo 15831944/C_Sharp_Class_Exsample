@@ -34,14 +34,13 @@ namespace AutoColor
                 byte[] buf = new byte[bmpData.Height * bmpData.Stride];
                 Marshal.Copy(bmpData.Scan0, buf, 0, buf.Length);
 
-                //拉伸色阶
-                //edit(ref buf);
-                gamma(ref buf);
-                getInfo(buf);
+                edit(ref buf);
+
                 Marshal.Copy(buf, 0, bmpData.Scan0, buf.Length);
                 bMap.UnlockBits(bmpData);
                 pictureBox2.Image = bMap;
                 pictureBox3.Refresh();
+
                 //string savePath = Path.Combine(
                 //    Path.GetDirectoryName(openFileDialog1.FileName),
                 //    Path.GetFileNameWithoutExtension(openFileDialog1.FileName) + "_Edit.jpg");
@@ -49,45 +48,67 @@ namespace AutoColor
                 //bMap.Dispose();
             }
         }
-        /// <summary>
-        /// 获取
-        /// </summary>
-        /// <param name="buf"></param>
-        void getInfo(byte[] buf)
-        {
-            acters = new List<int[]>() { new int[256], new int[256], new int[256] };
-            for (int u = 0; u < buf.Length; u++)
-            {
-                if (u % 3 == 0) acters[0][buf[u]]++;
-                else if (u % 3 == 1) acters[1][buf[u]]++;
-                else if (u % 3 == 2) acters[2][buf[u]]++;
-            }
-        }
+
         /// <summary>
         /// 拉伸色阶
         /// </summary>
         /// <param name="buf"></param>
         void edit(ref byte[] buf)
         {
+            //获取直方
+            acters = new List<int[]>() { new int[256], new int[256], new int[256] };
+            for (int u = 0; u < buf.Length; u += 3)
+            {
+                acters[0][buf[u]]++;
+                acters[1][buf[u + 1]]++;
+                acters[2][buf[u + 2]]++;
+            }
+            //获取截断区
             minMax = new List<Point>();
             int filterCount = buf.Length / (fa * 3);
             for (int band = 0; band < acters.Count; band++)
             {
-                int minValue = 0;
-                for (; minValue < acters[band].Length; minValue++)
-                    if (acters[band][minValue] > filterCount && acters[band][minValue] < acters[band][minValue + 1])
+                int[] ac = acters[band];
+                int miv = 0, mav = 255;
+                for (; miv <= 255; miv++)
+                    if (ac[miv] > filterCount && ac[miv] < ac[miv + 1] && ac[miv + 1] < ac[miv + 2])
                         break;
-                int maxValue = acters[band].Length - 1;
-                for (; maxValue >= 0; maxValue--)
-                    if (acters[band][maxValue] > filterCount && acters[band][maxValue] < acters[band][maxValue - 1])
+                for (; mav >= 0; mav--)
+                    if (ac[mav] > filterCount && ac[mav] < ac[mav - 1] && ac[mav - 1] < ac[mav - 2])
                         break;
-                minMax.Add(new Point(minValue, maxValue));
-                float zo = 255f / (maxValue - minValue);
+                minMax.Add(new Point(miv, mav));
+            }
+
+            //保护机制，触发后不对源数据做任何处理，保护域10/255
+            if (minMax.Exists(p => (p.X < 10 && p.Y > 254)  //截断区与启始区过近，表示原图质量OK，不需要做处理
+                      || p.X >= 254 || p.Y <= 10)) return;  //截断区过大，保留区不足以用于拉伸，表示原图质量过差，没有处理的意义
+
+            //分波段拉伸
+            for (int band = 0; band < minMax.Count; band++)
+            {
+                float zo = 255f / (minMax[band].Y - minMax[band].X);
                 for (int i = band; i < buf.Length; i += 3)
                 {
-                    int res = (int)Math.Round((buf[i] - minValue) * zo);
+                    int res = (int)Math.Round((buf[i] - minMax[band].X) * zo);
                     buf[i] = (byte)(res < 0 ? 0 : res > 255 ? 255 : res);
                 }
+            }
+
+            //gamma变换
+            List<double> gammas = new List<double>() { 0, 0, 0 };
+            for (int i = 0; i < buf.Length; i += 3)
+            {
+                gammas[0] += buf[i];
+                gammas[1] += buf[i + 1];
+                gammas[2] += buf[i + 2];
+            }
+            for (int i = 0; i < gammas.Count; i++)
+                gammas[i] = (gammas[i] / (buf.Length / 3)) / 100;
+            this.Text = $"gammas: B:{gammas[0]:f3},G:{gammas[1]:n3},R:{gammas[2]:f3}";
+            for (int i = 0; i < buf.Length; i++)
+            {
+                double gam = gammas[i % 3];
+                buf[i] = (byte)(int)(Math.Pow(buf[i] / 255f, gam) * 255);
             }
         }
         /// <summary>
@@ -110,7 +131,7 @@ namespace AutoColor
         /// <param name="buf"></param>
         void zhishu(ref byte[] buf)
         {
-            float c = 2f / 255;
+            float c = 1f / 255;
             for (int i = 0; i < buf.Length; i++)
             {
                 byte ori = buf[i];
@@ -118,24 +139,10 @@ namespace AutoColor
                 buf[i] = (byte)(res < 0 ? 0 : res > 255 ? 255 : res);
             }
         }
-        /// <summary>
-        /// gamma变换
-        /// </summary>
-        /// <param name="buf"></param>
-        void gamma(ref byte[] buf)
-        {
-            for (int i = 0; i < buf.Length; i++)
-            {
-                byte ori = buf[i];
-                int  res = (int)(Math.Pow(ori / 255f, 1) * 255);
-                buf[i] = (byte)(res < 0 ? 0 : res > 255 ? 255 : res);
-            }
-        }
         private void Form2_Layout(object sender, LayoutEventArgs e)
         {
             splitContainer2.SplitterDistance = Width / 2;
         }
-
         private void pictureBox3_Paint(object sender, PaintEventArgs e)
         {
             if (acters == null) return;
