@@ -169,5 +169,19 @@ namespace AutoColor
             ///  y =  pic.w * ac[r] / ac.max   fo = pic.h /  ac.max 
             ///  y = ac[r] * fo
         }
+        PointF zx2cf(List<PointF> points)
+        {
+            float sum_x2 = 0, sum_y = 0, sum_x = 0, sum_xy = 0, a = 0, b = 0;
+            for (int i = 0; i < points.Count; i++)
+            {
+                sum_x2 += points[i].X * points[i].X;
+                sum_y += points[i].Y;
+                sum_x += points[i].X;
+                sum_xy += points[i].X * points[i].Y;
+            }
+            a = (points.Count * sum_xy - sum_x * sum_y) / (points.Count * sum_x2 - sum_x * sum_x);
+            b = (sum_x2 * sum_y - sum_x * sum_xy) / (points.Count * sum_x2 - sum_x * sum_x);
+            return new PointF(a, b);
+        }
     }
 }
