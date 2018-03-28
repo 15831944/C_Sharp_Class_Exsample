@@ -169,18 +169,23 @@ namespace AutoColor
             ///  y =  pic.w * ac[r] / ac.max   fo = pic.h /  ac.max 
             ///  y = ac[r] * fo
         }
+        /// <summary>
+        /// 最小二乘法
+        /// </summary>
+        /// <param name="points"></param>
+        /// <returns></returns>
         PointF zx2cf(List<PointF> points)
         {
-            float sum_x2 = 0, sum_y = 0, sum_x = 0, sum_xy = 0, a = 0, b = 0;
+            float x2 = 0, y = 0, x = 0, xy = 0, a = 0, b = 0;
             for (int i = 0; i < points.Count; i++)
             {
-                sum_x2 += points[i].X * points[i].X;
-                sum_y += points[i].Y;
-                sum_x += points[i].X;
-                sum_xy += points[i].X * points[i].Y;
+                x2 += points[i].X * points[i].X;
+                y += points[i].Y;
+                x += points[i].X;
+                xy += points[i].X * points[i].Y;
             }
-            a = (points.Count * sum_xy - sum_x * sum_y) / (points.Count * sum_x2 - sum_x * sum_x);
-            b = (sum_x2 * sum_y - sum_x * sum_xy) / (points.Count * sum_x2 - sum_x * sum_x);
+            a = (points.Count * xy - x * y) / (points.Count * x2 - x * x);
+            b = (x2 * y - x * xy) / (points.Count * x2 - x * x);
             return new PointF(a, b);
         }
     }
